@@ -747,6 +747,51 @@ body.annot-active .sidebar { padding-top: calc(28px + 48px); }
   .main { margin-left: 0 !important; padding: 0 !important; }
 }
 
+
+/* ═══════════════════════════════════════
+   스크롤 수정 & 스크롤바 스타일
+   ═══════════════════════════════════════ */
+
+/* 캔버스는 항상 터치/클릭 통과 — JS에서 펜슬만 직접 처리 */
+#annot-canvas {
+  pointer-events: none !important;
+  touch-action: none;
+}
+
+/* 오른쪽 커스텀 스크롤바 (데스크톱) */
+::-webkit-scrollbar { width: 8px; }
+::-webkit-scrollbar-track { background: var(--bg); }
+::-webkit-scrollbar-thumb {
+  background: #c0bcb8;
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover { background: #9d9690; }
+
+/* 아이패드: 항상 스크롤바 보이게 */
+@media (pointer: coarse), (max-width: 1024px) {
+  html {
+    overflow-y: scroll;
+    -webkit-overflow-scrolling: touch;
+  }
+  body {
+    overflow-y: visible;
+  }
+  /* 오른쪽 스크롤바 영역 확보 */
+  .main { padding-right: 24px !important; }
+
+  /* 아이패드 스크롤바 굵게 */
+  ::-webkit-scrollbar { width: 6px; }
+  ::-webkit-scrollbar-thumb {
+    background: rgba(0,0,0,0.25);
+    border-radius: 3px;
+  }
+
+  /* 캔버스 영역도 스크롤 통과 */
+  #annot-canvas {
+    pointer-events: none !important;
+  }
+}
+
 </style>
 </head>
 <body>
@@ -2800,44 +2845,54 @@ function setColor(el) {
 // ── 그리기 이벤트 ──
 function getPos(e) {
   const r = canvas.getBoundingClientRect();
-  if (e.touches) {
-    return { x: e.touches[0].clientX - r.left, y: e.touches[0].clientY - r.top };
-  }
-  return { x: e.clientX - r.left, y: e.clientY - r.top };
+  const clientX = e.clientX ?? (e.touches && e.touches[0].clientX);
+  const clientY = e.clientY ?? (e.touches && e.touches[0].clientY);
+  return { x: clientX - r.left, y: clientY - r.top };
 }
 
-canvas.addEventListener('mousedown',  startDraw);
-canvas.addEventListener('mousemove',  moveDraw);
-canvas.addEventListener('mouseup',    endDraw);
-canvas.addEventListener('mouseleave', endDraw);
-canvas.addEventListener('touchstart', e => { e.preventDefault(); startDraw(e); }, {passive:false});
-canvas.addEventListener('touchmove',  e => { e.preventDefault(); moveDraw(e);  }, {passive:false});
-canvas.addEventListener('touchend',   endDraw);
+// ── PointerEvent 기반 통합 핸들러 ──
+// 펜슬(pointerType='pen') → 필기
+// 손가락(pointerType='touch') → 스크롤 통과 (pointer-events:none 유지)
+// 마우스(pointerType='mouse') → 필기
 
-function startDraw(e) {
+function isPen(e) {
+  return e.pointerType === 'pen' || e.pointerType === 'mouse';
+}
+
+// 펜슬 감지 시 캔버스가 이벤트 받도록 설정
+document.addEventListener('pointermove', e => {
+  if (!toolbar.classList.contains('hidden')) {
+    if (e.pointerType === 'pen') {
+      canvas.style.pointerEvents = 'all';
+    } else if (e.pointerType === 'touch') {
+      canvas.style.pointerEvents = 'none';
+    }
+  }
+}, { passive: true });
+
+canvas.addEventListener('pointerdown', e => {
+  if (!isPen(e)) return;
+  e.preventDefault();
   if (mode === 'text') { placeText(e); return; }
   if (mode === 'eraser') { eraseAt(getPos(e)); return; }
 
+  canvas.setPointerCapture(e.pointerId);
   isDrawing = true;
   const pos = getPos(e);
   const alpha = mode === 'highlight' ? 0.3 : 1.0;
-  const size  = mode === 'highlight'
-    ? +document.getElementById('pen-size').value * 5
-    : +document.getElementById('pen-size').value;
+  const pressure = e.pressure || 0.5;
+  const baseSize = +document.getElementById('pen-size').value;
+  const size = mode === 'highlight'
+    ? baseSize * 5
+    : Math.max(1, baseSize * (0.5 + pressure));
 
-  currentStroke = {
-    type: mode,
-    color: penColor,
-    size,
-    alpha,
-    points: [pos]
-  };
-}
+  currentStroke = { type: mode, color: penColor, size, alpha, points: [pos] };
+});
 
-function moveDraw(e) {
+canvas.addEventListener('pointermove', e => {
+  if (!isPen(e)) return;
   const pos = getPos(e);
 
-  // 지우개 커서 위치
   if (mode === 'eraser') {
     const sz = +document.getElementById('pen-size').value * 3;
     eraserCursor.style.display = 'block';
@@ -2845,16 +2900,74 @@ function moveDraw(e) {
     eraserCursor.style.height = sz * 2 + 'px';
     eraserCursor.style.left   = e.clientX + 'px';
     eraserCursor.style.top    = e.clientY + 'px';
-    if (e.buttons === 1 || (e.touches && e.touches.length)) eraseAt(pos);
+    if (e.buttons > 0) eraseAt(pos);
     return;
   }
   if (!isDrawing || !currentStroke) return;
 
+  // 필압으로 굵기 동적 조절
+  const pressure = e.pressure || 0.5;
+  const baseSize = +document.getElementById('pen-size').value;
+  if (mode !== 'highlight') {
+    currentStroke.size = Math.max(1, baseSize * (0.5 + pressure));
+  }
   currentStroke.points.push(pos);
+  redraw();
+  drawStroke(currentStroke, true);
+});
+
+canvas.addEventListener('pointerup', e => {
+  if (!isPen(e)) return;
+  if (mode === 'eraser') { eraserCursor.style.display = 'none'; return; }
+  if (!isDrawing || !currentStroke) return;
+  isDrawing = false;
+  strokes.push(currentStroke);
+  currentStroke = null;
+});
+
+canvas.addEventListener('pointercancel', () => {
+  isDrawing = false;
+  currentStroke = null;
+});
+
+// 마우스용 폴백 (데스크톱)
+canvas.addEventListener('mousedown', e => {
+  if (e.pointerType) return; // PointerEvent가 이미 처리
+  startDrawMouse(e);
+});
+canvas.addEventListener('mousemove', moveDrawMouse);
+canvas.addEventListener('mouseup',   endDrawMouse);
+canvas.addEventListener('mouseleave',endDrawMouse);
+
+function startDrawMouse(e) {
+  if (mode === 'text') { placeText(e); return; }
+  if (mode === 'eraser') { eraseAt(getPos(e)); return; }
+  isDrawing = true;
+  const pos = getPos(e);
+  const alpha = mode === 'highlight' ? 0.3 : 1.0;
+  const size  = mode === 'highlight'
+    ? +document.getElementById('pen-size').value * 5
+    : +document.getElementById('pen-size').value;
+  currentStroke = { type: mode, color: penColor, size, alpha, points: [pos] };
+}
+function moveDrawMouse(e) {
+  const pos = getPos(e);
+  if (mode === 'eraser') {
+    const sz = +document.getElementById('pen-size').value * 3;
+    eraserCursor.style.display = 'block';
+    eraserCursor.style.width  = sz * 2 + 'px';
+    eraserCursor.style.height = sz * 2 + 'px';
+    eraserCursor.style.left   = e.clientX + 'px';
+    eraserCursor.style.top    = e.clientY + 'px';
+    if (e.buttons === 1) eraseAt(pos);
+    return;
+  }
+  if (!isDrawing || !currentStroke) return;
+  currentStroke.points.push(pos);
+  redraw();
   drawStroke(currentStroke, true);
 }
-
-function endDraw() {
+function endDrawMouse() {
   if (mode === 'eraser') { eraserCursor.style.display = 'none'; return; }
   if (!isDrawing || !currentStroke) return;
   isDrawing = false;
