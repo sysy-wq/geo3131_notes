@@ -607,130 +607,96 @@ body.annot-active .sidebar { padding-top: calc(28px + 48px); }
 }
 
 
-/* ═══════════════════════════════
-   iPad / 모바일 + 스크롤바
-   ═══════════════════════════════ */
-
-/* 커스텀 스크롤바 (데스크톱) */
+/* ── iPad 최소 수정 ── */
 ::-webkit-scrollbar { width: 8px; }
 ::-webkit-scrollbar-track { background: var(--bg); }
 ::-webkit-scrollbar-thumb { background: #c0bcb8; border-radius: 4px; }
-::-webkit-scrollbar-thumb:hover { background: #9d9690; }
 
-/* 모바일 상단 헤더 */
+/* 캔버스: 기본은 완전히 통과 */
+#annot-canvas { touch-action: pan-y !important; }
+/* 필기 모드일 때만 터치 차단 */
+#annot-canvas.writing { touch-action: none !important; }
+
 #mobile-header {
   display: none;
-  position: fixed;
-  top: 0; left: 0; right: 0; height: 52px;
-  background: #1a1917; color: #fff;
-  align-items: center; padding: 0 16px; gap: 12px;
-  z-index: 600;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+  position: fixed; top:0; left:0; right:0; height:52px;
+  background:#1a1917; color:#fff;
+  align-items:center; padding:0 16px; gap:12px;
+  z-index:600; box-shadow:0 2px 8px rgba(0,0,0,0.3);
 }
 #mobile-header .mh-title {
-  font-size: 14px; font-weight: 700; flex: 1;
-  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  font-size:14px; font-weight:700; flex:1;
+  white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
 }
 #mobile-header button {
-  background: none; border: none; color: #fff;
-  font-size: 20px; cursor: pointer;
-  width: 44px; height: 44px;
-  display: flex; align-items: center; justify-content: center;
-  border-radius: 8px; flex-shrink: 0;
+  background:none; border:none; color:#fff; font-size:20px;
+  cursor:pointer; width:44px; height:44px;
+  display:flex; align-items:center; justify-content:center;
+  border-radius:8px;
 }
-#mobile-header button:active { background: rgba(255,255,255,0.15); }
-
-/* 사이드바 오버레이 */
 #sidebar-overlay {
-  display: none; position: fixed; inset: 0;
-  background: rgba(0,0,0,0.45); z-index: 490;
+  display:none; position:fixed; inset:0;
+  background:rgba(0,0,0,0.45); z-index:490;
 }
-#sidebar-overlay.show { display: block; }
+#sidebar-overlay.show { display:block; }
 
-@media (max-width: 1024px), (pointer: coarse) {
-  /* 헤더 표시 */
-  #mobile-header { display: flex !important; }
-
-  /* 사이드바 드로어 */
+@media (max-width:1024px), (pointer:coarse) {
+  #mobile-header { display:flex !important; }
   .sidebar {
-    transform: translateX(-100%);
-    transition: transform 0.28s ease;
-    width: 280px; z-index: 500;
-    box-shadow: 4px 0 24px rgba(0,0,0,0.3);
-    padding-top: 60px !important;
+    transform:translateX(-100%);
+    transition:transform 0.28s ease;
+    width:280px; z-index:500;
+    box-shadow:4px 0 24px rgba(0,0,0,0.3);
+    padding-top:60px !important;
   }
-  .sidebar.open { transform: translateX(0); }
-
-  /* 메인 전체 너비, 상단 헤더 여백 */
+  .sidebar.open { transform:translateX(0); }
   .main {
-    margin-left: 0 !important;
-    padding: 68px 16px 120px 16px !important;
-    max-width: 100% !important;
+    margin-left:0 !important;
+    padding:68px 16px 100px !important;
+    max-width:100% !important;
   }
-
   /* 툴바 하단 고정 */
   #annot-toolbar {
-    left: 0 !important; top: auto !important;
-    bottom: 0 !important; height: auto !important;
-    min-height: 60px;
-    padding: 8px 10px env(safe-area-inset-bottom) !important;
-    flex-wrap: wrap; gap: 6px !important;
-    border-top: 1px solid #ddd; border-bottom: none;
-    box-shadow: 0 -2px 12px rgba(0,0,0,0.1);
+    left:0 !important; top:auto !important; bottom:0 !important;
+    height:auto !important; min-height:60px;
+    padding:8px 10px calc(8px + env(safe-area-inset-bottom)) !important;
+    flex-wrap:wrap; gap:6px !important;
+    border-top:1px solid #ddd; border-bottom:none;
+    box-shadow:0 -2px 12px rgba(0,0,0,0.1);
   }
-  .tb-btn {
-    padding: 8px 12px !important; font-size: 13px !important;
-    min-height: 44px; min-width: 44px;
-  }
-  .tb-btn svg { width: 18px !important; height: 18px !important; }
-  .color-swatch { width: 28px !important; height: 28px !important; }
-  #pen-size { width: 80px !important; }
-
-  /* 캔버스 위치 */
-  #annot-canvas {
-    top: 52px !important; left: 0 !important; bottom: 68px !important;
-  }
-
-  /* FAB 숨기기 */
-  #annot-fab { display: none !important; }
-
-  /* 이미지 풀 너비 */
-  .slide-img img { max-width: 100% !important; }
-
-  /* 그리드 단일 컬럼 */
-  .grid-2, .grid-3 { grid-template-columns: 1fr !important; }
-
-  /* 스크롤바 */
-  ::-webkit-scrollbar { width: 5px; }
-  ::-webkit-scrollbar-thumb { background: rgba(0,0,0,0.2); }
-
-  /* 텍스트 입력 iOS 줌 방지 */
-  #annot-textinput { font-size: 16px !important; }
-
-  body.annot-active .main { padding-bottom: 140px !important; }
+  .tb-btn { padding:8px 12px !important; min-height:44px; min-width:44px; }
+  .tb-btn svg { width:18px !important; height:18px !important; }
+  .color-swatch { width:28px !important; height:28px !important; }
+  #pen-size { width:80px !important; }
+  #annot-canvas { top:52px !important; left:0 !important; bottom:68px !important; }
+  #annot-fab { display:none !important; }
+  .slide-img img { max-width:100% !important; }
+  .grid-2, .grid-3 { grid-template-columns:1fr !important; }
+  body.annot-active .main { padding-bottom:140px !important; }
+  ::-webkit-scrollbar { width:5px; }
+  ::-webkit-scrollbar-thumb { background:rgba(0,0,0,0.2); border-radius:3px; }
 }
 
 @media print {
-  #mobile-header, #sidebar-overlay,
-  #annot-toolbar, #annot-canvas, #annot-fab,
-  #annot-textinput, #eraser-cursor, #annot-toast { display: none !important; }
-  .sidebar { display: none !important; }
-  .main { margin-left: 0 !important; padding: 0 !important; max-width: 100% !important; }
-  * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
-  @page { size: A4; margin: 18mm 16mm; }
-  .week-section { page-break-before: always; }
-  .course-header + .week-section { page-break-before: avoid; }
-  .topic, .card, .def-box, .formula-box { page-break-inside: avoid; }
+  #mobile-header, #sidebar-overlay, #annot-toolbar,
+  #annot-canvas, #annot-fab, #annot-textinput,
+  #eraser-cursor, #annot-toast { display:none !important; }
+  .sidebar { display:none !important; }
+  .main { margin-left:0 !important; padding:0 !important; max-width:100% !important; }
+  * { -webkit-print-color-adjust:exact !important; print-color-adjust:exact !important; }
+  @page { size:A4; margin:18mm 16mm; }
+  .week-section { page-break-before:always; }
+  .course-header + .week-section { page-break-before:avoid; }
+  .topic, .card, .def-box, .formula-box { page-break-inside:avoid; }
 }
 
 </style>
 </head>
 <body>
-<!-- 모바일 헤더 -->
 <div id="mobile-header">
   <button onclick="toggleSidebar()">☰</button>
   <span class="mh-title">교통체계분석 정리노트</span>
-  <button onclick="toggleToolbar()">✏️</button>
+  <button onclick="toggleToolbar()" id="mh-pen-btn">✏️</button>
   <button onclick="printNote()">🖨️</button>
 </div>
 <div id="sidebar-overlay" onclick="toggleSidebar()"></div>
@@ -3012,120 +2978,63 @@ setMode('draw');
 
 
 <script>
-// ═══════════════════════════════════════
-//  iPad / 모바일 기능
-// ═══════════════════════════════════════
+// ── 사이드바 드로어 ──
+const _sidebar = document.querySelector('.sidebar');
+const _overlay = document.getElementById('sidebar-overlay');
 
-const sidebar = document.querySelector('.sidebar');
-const overlay = document.getElementById('sidebar-overlay');
-const isMobile = () => window.innerWidth <= 1024 || ('ontouchstart' in window);
-
-// 사이드바 토글
 function toggleSidebar() {
-  const open = sidebar.classList.toggle('open');
-  overlay.classList.toggle('show', open);
+  const open = _sidebar.classList.toggle('open');
+  _overlay.classList.toggle('show', open);
   document.body.style.overflow = open ? 'hidden' : '';
 }
-
-// 목차 링크 클릭 시 닫기
-document.querySelectorAll('.nav-link').forEach(link => {
-  link.addEventListener('click', () => {
-    if (isMobile()) {
-      toggleSidebar();
-    }
+document.querySelectorAll('.nav-link').forEach(l => {
+  l.addEventListener('click', () => {
+    if (window.innerWidth <= 1024) toggleSidebar();
   });
 });
 
-// 스와이프로 사이드바 열기/닫기
-let swipeStartX = 0;
-document.addEventListener('touchstart', e => {
-  swipeStartX = e.touches[0].clientX;
-}, { passive: true });
+// 스와이프
+let _sx = 0;
+document.addEventListener('touchstart', e => { _sx = e.touches[0].clientX; }, {passive:true});
 document.addEventListener('touchend', e => {
-  const dx = e.changedTouches[0].clientX - swipeStartX;
-  if (dx > 60 && swipeStartX < 30) toggleSidebar();   // 왼쪽 끝에서 오른쪽 스와이프 → 열기
-  if (dx < -60 && sidebar.classList.contains('open')) toggleSidebar(); // 왼쪽 스와이프 → 닫기
-}, { passive: true });
+  const dx = e.changedTouches[0].clientX - _sx;
+  if (dx > 60 && _sx < 30 && !_sidebar.classList.contains('open')) toggleSidebar();
+  if (dx < -60 && _sidebar.classList.contains('open')) toggleSidebar();
+}, {passive:true});
 
-// ── Apple Pencil: PointerEvent로 필기 / 손가락은 스크롤 ──
-const annotCanvas = document.getElementById('annot-canvas');
+// ── 툴바 토글 오버라이드 ──
+// 필기 모드 ON → 캔버스 writing 클래스 추가 (touch-action:none)
+// 필기 모드 OFF → 캔버스 writing 클래스 제거 (touch-action:pan-y = 손가락 스크롤)
+const _annotCanvas = document.getElementById('annot-canvas');
+const _origToggle = window.toggleToolbar;
 
-// 펜슬 또는 마우스인지 확인
-function isPenOrMouse(e) {
-  return e.pointerType === 'pen' || e.pointerType === 'mouse';
-}
-
-// PointerEvent 핸들러 등록 (기존 mouse/touch 이벤트 대신)
-annotCanvas.addEventListener('pointerdown', e => {
-  if (!isPenOrMouse(e)) return;  // 손가락이면 무시 → 스크롤됨
-  e.preventDefault();
-  annotCanvas.setPointerCapture(e.pointerId);
-
-  if (mode === 'text') { placeText(e); return; }
-  if (mode === 'eraser') { eraseAt({ x: e.clientX - annotCanvas.getBoundingClientRect().left, y: e.clientY - annotCanvas.getBoundingClientRect().top }); return; }
-
-  isDrawing = true;
-  const r = annotCanvas.getBoundingClientRect();
-  const pos = { x: e.clientX - r.left, y: e.clientY - r.top };
-  const pressure = e.pressure > 0 ? e.pressure : 0.5;
-  const baseSize = +document.getElementById('pen-size').value;
-  const alpha = mode === 'highlight' ? 0.35 : 1.0;
-  const size  = mode === 'highlight' ? baseSize * 5 : Math.max(1, baseSize * (0.4 + pressure * 1.2));
-
-  currentStroke = { type: mode, color: penColor, size, alpha, points: [pos] };
-}, { passive: false });
-
-annotCanvas.addEventListener('pointermove', e => {
-  if (!isPenOrMouse(e) || !isDrawing || !currentStroke) return;
-  e.preventDefault();
-  const r = annotCanvas.getBoundingClientRect();
-  const pos = { x: e.clientX - r.left, y: e.clientY - r.top };
-
-  if (mode === 'eraser') {
-    eraseAt(pos);
-    return;
-  }
-
-  // 필압에 따른 굵기 조절
-  if (mode !== 'highlight' && e.pressure > 0) {
-    const baseSize = +document.getElementById('pen-size').value;
-    currentStroke.size = Math.max(1, baseSize * (0.4 + e.pressure * 1.2));
-  }
-  currentStroke.points.push(pos);
-  redraw();
-  drawStroke(currentStroke, true);
-}, { passive: false });
-
-annotCanvas.addEventListener('pointerup', e => {
-  if (!isPenOrMouse(e)) return;
-  if (mode === 'eraser') { eraserCursor.style.display = 'none'; return; }
-  if (!isDrawing || !currentStroke) return;
-  isDrawing = false;
-  strokes.push(currentStroke);
-  currentStroke = null;
-});
-
-annotCanvas.addEventListener('pointercancel', () => {
-  isDrawing = false;
-  currentStroke = null;
-});
-
-// 모바일에서 툴바 토글 시 헤더 아이콘 색상 변경
-const origToggle = window.toggleToolbar;
 window.toggleToolbar = function() {
   const toolbar = document.getElementById('annot-toolbar');
   const hidden = toolbar.classList.toggle('hidden');
   document.body.classList.toggle('annot-active', !hidden);
+  
+  // 캔버스 터치 모드 전환
+  if (hidden) {
+    _annotCanvas.classList.remove('writing');  // 필기 OFF → 손가락 스크롤 가능
+  } else {
+    _annotCanvas.classList.add('writing');     // 필기 ON → 터치로 필기
+    resizeCanvas();
+    setMode('draw');
+  }
+  
+  // 헤더 버튼 색상
+  const btn = document.getElementById('mh-pen-btn');
+  if (btn) btn.style.color = hidden ? '' : '#60a5fa';
+  
   const fab = document.getElementById('annot-fab');
   if (fab) fab.textContent = hidden ? '✏️' : '✕';
-  if (!hidden) { resizeCanvas(); setMode('draw'); }
 };
 
-// 방향 전환 시 캔버스 재계산
+// 방향 전환
 window.addEventListener('orientationchange', () => setTimeout(resizeCanvas, 400));
 
-// 모바일 레이아웃 초기화
-if (isMobile()) {
+// 초기 레이아웃
+if (window.innerWidth <= 1024 || 'ontouchstart' in window) {
   document.querySelector('.main').style.paddingTop = '68px';
 }
 </script>
