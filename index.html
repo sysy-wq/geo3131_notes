@@ -607,217 +607,132 @@ body.annot-active .sidebar { padding-top: calc(28px + 48px); }
 }
 
 
-/* ═══════════════════════════════════════
-   iPad / 모바일 최적화
-   ═══════════════════════════════════════ */
+/* ═══════════════════════════════
+   iPad / 모바일 + 스크롤바
+   ═══════════════════════════════ */
 
-/* 터치 기기 전반 */
-@media (pointer: coarse), (max-width: 1024px) {
+/* 커스텀 스크롤바 (데스크톱) */
+::-webkit-scrollbar { width: 8px; }
+::-webkit-scrollbar-track { background: var(--bg); }
+::-webkit-scrollbar-thumb { background: #c0bcb8; border-radius: 4px; }
+::-webkit-scrollbar-thumb:hover { background: #9d9690; }
 
-  /* 사이드바 → 드로어(슬라이드) 방식 */
+/* 모바일 상단 헤더 */
+#mobile-header {
+  display: none;
+  position: fixed;
+  top: 0; left: 0; right: 0; height: 52px;
+  background: #1a1917; color: #fff;
+  align-items: center; padding: 0 16px; gap: 12px;
+  z-index: 600;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+}
+#mobile-header .mh-title {
+  font-size: 14px; font-weight: 700; flex: 1;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+#mobile-header button {
+  background: none; border: none; color: #fff;
+  font-size: 20px; cursor: pointer;
+  width: 44px; height: 44px;
+  display: flex; align-items: center; justify-content: center;
+  border-radius: 8px; flex-shrink: 0;
+}
+#mobile-header button:active { background: rgba(255,255,255,0.15); }
+
+/* 사이드바 오버레이 */
+#sidebar-overlay {
+  display: none; position: fixed; inset: 0;
+  background: rgba(0,0,0,0.45); z-index: 490;
+}
+#sidebar-overlay.show { display: block; }
+
+@media (max-width: 1024px), (pointer: coarse) {
+  /* 헤더 표시 */
+  #mobile-header { display: flex !important; }
+
+  /* 사이드바 드로어 */
   .sidebar {
     transform: translateX(-100%);
-    transition: transform 0.28s cubic-bezier(0.4,0,0.2,1);
-    width: 280px;
-    z-index: 500;
-    box-shadow: 4px 0 24px rgba(0,0,0,0.25);
+    transition: transform 0.28s ease;
+    width: 280px; z-index: 500;
+    box-shadow: 4px 0 24px rgba(0,0,0,0.3);
+    padding-top: 60px !important;
   }
   .sidebar.open { transform: translateX(0); }
 
-  /* 메인 콘텐츠 전체 너비 */
+  /* 메인 전체 너비, 상단 헤더 여백 */
   .main {
     margin-left: 0 !important;
-    padding: 72px 20px 100px !important;
+    padding: 68px 16px 120px 16px !important;
     max-width: 100% !important;
   }
 
-  /* 오버레이 (사이드바 열릴 때 배경 어둡게) */
-  #sidebar-overlay {
-    display: none;
-    position: fixed; inset: 0;
-    background: rgba(0,0,0,0.45);
-    z-index: 490;
-  }
-  #sidebar-overlay.show { display: block; }
-
-  /* 상단 모바일 헤더바 */
-  #mobile-header {
-    display: flex !important;
-  }
-
-  /* 툴바: 하단 고정, 더 높게 */
+  /* 툴바 하단 고정 */
   #annot-toolbar {
-    left: 0 !important;
-    top: auto !important;
-    bottom: 0 !important;
-    height: auto !important;
-    min-height: 64px;
-    padding: 8px 12px calc(8px + env(safe-area-inset-bottom)) !important;
-    flex-wrap: wrap;
-    gap: 8px !important;
-    border-top: 1px solid #ddd9d4;
-    border-bottom: none;
+    left: 0 !important; top: auto !important;
+    bottom: 0 !important; height: auto !important;
+    min-height: 60px;
+    padding: 8px 10px env(safe-area-inset-bottom) !important;
+    flex-wrap: wrap; gap: 6px !important;
+    border-top: 1px solid #ddd; border-bottom: none;
     box-shadow: 0 -2px 12px rgba(0,0,0,0.1);
   }
-
-  /* 툴바 버튼 더 크게 (터치 영역 44px 이상) */
   .tb-btn {
-    padding: 10px 14px !important;
-    font-size: 14px !important;
-    min-height: 44px;
-    border-radius: 10px !important;
+    padding: 8px 12px !important; font-size: 13px !important;
+    min-height: 44px; min-width: 44px;
   }
-  .tb-btn svg { width: 20px !important; height: 20px !important; }
+  .tb-btn svg { width: 18px !important; height: 18px !important; }
+  .color-swatch { width: 28px !important; height: 28px !important; }
+  #pen-size { width: 80px !important; }
 
-  /* 색상 스와치 더 크게 */
-  .color-swatch { width: 32px !important; height: 32px !important; }
-
-  /* 슬라이더 터치 영역 */
-  #pen-size, #pen-opacity {
-    width: 90px !important;
-    height: 20px !important;
-    cursor: pointer;
-  }
-
-  /* 캔버스: 툴바 높이(약 80px) + 상단 헤더(52px) 피하기 */
+  /* 캔버스 위치 */
   #annot-canvas {
-    top: 52px !important;
-    left: 0 !important;
-    bottom: 80px !important;
+    top: 52px !important; left: 0 !important; bottom: 68px !important;
   }
 
-  /* FAB 숨기기 (하단 툴바로 대체) */
+  /* FAB 숨기기 */
   #annot-fab { display: none !important; }
 
-  /* 이미지 너비 */
+  /* 이미지 풀 너비 */
   .slide-img img { max-width: 100% !important; }
 
   /* 그리드 단일 컬럼 */
   .grid-2, .grid-3 { grid-template-columns: 1fr !important; }
 
-  /* 테이블 가로 스크롤 */
-  .tbl-wrap { -webkit-overflow-scrolling: touch; }
-  table { min-width: 500px; }
+  /* 스크롤바 */
+  ::-webkit-scrollbar { width: 5px; }
+  ::-webkit-scrollbar-thumb { background: rgba(0,0,0,0.2); }
 
-  /* 텍스트 입력창 */
-  #annot-textinput { font-size: 16px !important; } /* iOS 줌 방지 */
+  /* 텍스트 입력 iOS 줌 방지 */
+  #annot-textinput { font-size: 16px !important; }
 
-  /* 본문 body: 툴바 열려있을 때 하단 여백 */
   body.annot-active .main { padding-bottom: 140px !important; }
 }
 
-/* 모바일 상단 헤더 (기본 숨김 → 모바일에서 표시) */
-#mobile-header {
-  display: none;
-  position: fixed;
-  top: 0; left: 0; right: 0;
-  height: 52px;
-  background: #1a1917;
-  color: #fff;
-  align-items: center;
-  padding: 0 16px;
-  gap: 12px;
-  z-index: 600;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.3);
-}
-#mobile-header .mh-title {
-  font-size: 14px; font-weight: 700;
-  flex: 1;
-  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
-}
-#mobile-header button {
-  background: none; border: none; color: #fff;
-  font-size: 22px; cursor: pointer;
-  width: 44px; height: 44px;
-  display: flex; align-items: center; justify-content: center;
-  border-radius: 8px;
-  flex-shrink: 0;
-}
-#mobile-header button:active { background: rgba(255,255,255,0.15); }
-
-/* Apple Pencil / 스타일러스 피드백 */
-@media (hover: none) and (pointer: fine) {
-  #annot-canvas.draw-mode { cursor: crosshair; }
-}
-
-/* 인쇄 시 모바일 UI 숨김 */
 @media print {
-  #mobile-header, #sidebar-overlay { display: none !important; }
+  #mobile-header, #sidebar-overlay,
+  #annot-toolbar, #annot-canvas, #annot-fab,
+  #annot-textinput, #eraser-cursor, #annot-toast { display: none !important; }
   .sidebar { display: none !important; }
-  .main { margin-left: 0 !important; padding: 0 !important; }
-}
-
-
-/* ═══════════════════════════════════════
-   스크롤 수정 & 스크롤바 스타일
-   ═══════════════════════════════════════ */
-
-/* 캔버스는 항상 터치/클릭 통과 — JS에서 펜슬만 직접 처리 */
-#annot-canvas {
-  pointer-events: none !important;
-  touch-action: none;
-}
-
-/* 오른쪽 커스텀 스크롤바 (데스크톱) */
-::-webkit-scrollbar { width: 8px; }
-::-webkit-scrollbar-track { background: var(--bg); }
-::-webkit-scrollbar-thumb {
-  background: #c0bcb8;
-  border-radius: 4px;
-}
-::-webkit-scrollbar-thumb:hover { background: #9d9690; }
-
-/* 아이패드: 항상 스크롤바 보이게 */
-@media (pointer: coarse), (max-width: 1024px) {
-  html {
-    overflow-y: scroll;
-    -webkit-overflow-scrolling: touch;
-  }
-  body {
-    overflow-y: visible;
-  }
-  /* 오른쪽 스크롤바 영역 확보 */
-  .main { padding-right: 24px !important; }
-
-  /* 아이패드 스크롤바 굵게 */
-  ::-webkit-scrollbar { width: 6px; }
-  ::-webkit-scrollbar-thumb {
-    background: rgba(0,0,0,0.25);
-    border-radius: 3px;
-  }
-
-  /* 캔버스 영역도 스크롤 통과 */
-  #annot-canvas {
-    pointer-events: none !important;
-  }
+  .main { margin-left: 0 !important; padding: 0 !important; max-width: 100% !important; }
+  * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
+  @page { size: A4; margin: 18mm 16mm; }
+  .week-section { page-break-before: always; }
+  .course-header + .week-section { page-break-before: avoid; }
+  .topic, .card, .def-box, .formula-box { page-break-inside: avoid; }
 }
 
 </style>
 </head>
 <body>
-<!-- 모바일 상단 헤더 -->
+<!-- 모바일 헤더 -->
 <div id="mobile-header">
-  <button onclick="toggleSidebar()" title="목차 열기" aria-label="목차">
-    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
-      <line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/>
-    </svg>
-  </button>
+  <button onclick="toggleSidebar()">☰</button>
   <span class="mh-title">교통체계분석 정리노트</span>
-  <button onclick="toggleToolbar()" title="필기 모드" aria-label="필기">
-    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
-      <path d="M12 20h9M16.5 3.5a2.121 2.121 0 013 3L7 19l-4 1 1-4L16.5 3.5z"/>
-    </svg>
-  </button>
-  <button onclick="printNote()" title="인쇄" aria-label="인쇄">
-    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
-      <polyline points="6 9 6 2 18 2 18 9"/>
-      <path d="M6 18H4a2 2 0 01-2-2v-5a2 2 0 012-2h16a2 2 0 012 2v5a2 2 0 01-2 2h-2"/>
-      <rect x="6" y="14" width="12" height="8"/>
-    </svg>
-  </button>
+  <button onclick="toggleToolbar()">✏️</button>
+  <button onclick="printNote()">🖨️</button>
 </div>
-
-<!-- 사이드바 오버레이 -->
 <div id="sidebar-overlay" onclick="toggleSidebar()"></div>
 
 <!-- 필기 툴바 -->
@@ -2845,113 +2760,44 @@ function setColor(el) {
 // ── 그리기 이벤트 ──
 function getPos(e) {
   const r = canvas.getBoundingClientRect();
-  const clientX = e.clientX ?? (e.touches && e.touches[0].clientX);
-  const clientY = e.clientY ?? (e.touches && e.touches[0].clientY);
-  return { x: clientX - r.left, y: clientY - r.top };
-}
-
-// ── PointerEvent 기반 통합 핸들러 ──
-// 펜슬(pointerType='pen') → 필기
-// 손가락(pointerType='touch') → 스크롤 통과 (pointer-events:none 유지)
-// 마우스(pointerType='mouse') → 필기
-
-function isPen(e) {
-  return e.pointerType === 'pen' || e.pointerType === 'mouse';
-}
-
-// 펜슬 감지 시 캔버스가 이벤트 받도록 설정
-document.addEventListener('pointermove', e => {
-  if (!toolbar.classList.contains('hidden')) {
-    if (e.pointerType === 'pen') {
-      canvas.style.pointerEvents = 'all';
-    } else if (e.pointerType === 'touch') {
-      canvas.style.pointerEvents = 'none';
-    }
+  if (e.touches) {
+    return { x: e.touches[0].clientX - r.left, y: e.touches[0].clientY - r.top };
   }
-}, { passive: true });
+  return { x: e.clientX - r.left, y: e.clientY - r.top };
+}
 
-canvas.addEventListener('pointerdown', e => {
-  if (!isPen(e)) return;
-  e.preventDefault();
+canvas.addEventListener('mousedown',  startDraw);
+canvas.addEventListener('mousemove',  moveDraw);
+canvas.addEventListener('mouseup',    endDraw);
+canvas.addEventListener('mouseleave', endDraw);
+canvas.addEventListener('touchstart', e => { e.preventDefault(); startDraw(e); }, {passive:false});
+canvas.addEventListener('touchmove',  e => { e.preventDefault(); moveDraw(e);  }, {passive:false});
+canvas.addEventListener('touchend',   endDraw);
+
+function startDraw(e) {
   if (mode === 'text') { placeText(e); return; }
   if (mode === 'eraser') { eraseAt(getPos(e)); return; }
 
-  canvas.setPointerCapture(e.pointerId);
-  isDrawing = true;
-  const pos = getPos(e);
-  const alpha = mode === 'highlight' ? 0.3 : 1.0;
-  const pressure = e.pressure || 0.5;
-  const baseSize = +document.getElementById('pen-size').value;
-  const size = mode === 'highlight'
-    ? baseSize * 5
-    : Math.max(1, baseSize * (0.5 + pressure));
-
-  currentStroke = { type: mode, color: penColor, size, alpha, points: [pos] };
-});
-
-canvas.addEventListener('pointermove', e => {
-  if (!isPen(e)) return;
-  const pos = getPos(e);
-
-  if (mode === 'eraser') {
-    const sz = +document.getElementById('pen-size').value * 3;
-    eraserCursor.style.display = 'block';
-    eraserCursor.style.width  = sz * 2 + 'px';
-    eraserCursor.style.height = sz * 2 + 'px';
-    eraserCursor.style.left   = e.clientX + 'px';
-    eraserCursor.style.top    = e.clientY + 'px';
-    if (e.buttons > 0) eraseAt(pos);
-    return;
-  }
-  if (!isDrawing || !currentStroke) return;
-
-  // 필압으로 굵기 동적 조절
-  const pressure = e.pressure || 0.5;
-  const baseSize = +document.getElementById('pen-size').value;
-  if (mode !== 'highlight') {
-    currentStroke.size = Math.max(1, baseSize * (0.5 + pressure));
-  }
-  currentStroke.points.push(pos);
-  redraw();
-  drawStroke(currentStroke, true);
-});
-
-canvas.addEventListener('pointerup', e => {
-  if (!isPen(e)) return;
-  if (mode === 'eraser') { eraserCursor.style.display = 'none'; return; }
-  if (!isDrawing || !currentStroke) return;
-  isDrawing = false;
-  strokes.push(currentStroke);
-  currentStroke = null;
-});
-
-canvas.addEventListener('pointercancel', () => {
-  isDrawing = false;
-  currentStroke = null;
-});
-
-// 마우스용 폴백 (데스크톱)
-canvas.addEventListener('mousedown', e => {
-  if (e.pointerType) return; // PointerEvent가 이미 처리
-  startDrawMouse(e);
-});
-canvas.addEventListener('mousemove', moveDrawMouse);
-canvas.addEventListener('mouseup',   endDrawMouse);
-canvas.addEventListener('mouseleave',endDrawMouse);
-
-function startDrawMouse(e) {
-  if (mode === 'text') { placeText(e); return; }
-  if (mode === 'eraser') { eraseAt(getPos(e)); return; }
   isDrawing = true;
   const pos = getPos(e);
   const alpha = mode === 'highlight' ? 0.3 : 1.0;
   const size  = mode === 'highlight'
     ? +document.getElementById('pen-size').value * 5
     : +document.getElementById('pen-size').value;
-  currentStroke = { type: mode, color: penColor, size, alpha, points: [pos] };
+
+  currentStroke = {
+    type: mode,
+    color: penColor,
+    size,
+    alpha,
+    points: [pos]
+  };
 }
-function moveDrawMouse(e) {
+
+function moveDraw(e) {
   const pos = getPos(e);
+
+  // 지우개 커서 위치
   if (mode === 'eraser') {
     const sz = +document.getElementById('pen-size').value * 3;
     eraserCursor.style.display = 'block';
@@ -2959,15 +2805,16 @@ function moveDrawMouse(e) {
     eraserCursor.style.height = sz * 2 + 'px';
     eraserCursor.style.left   = e.clientX + 'px';
     eraserCursor.style.top    = e.clientY + 'px';
-    if (e.buttons === 1) eraseAt(pos);
+    if (e.buttons === 1 || (e.touches && e.touches.length)) eraseAt(pos);
     return;
   }
   if (!isDrawing || !currentStroke) return;
+
   currentStroke.points.push(pos);
-  redraw();
   drawStroke(currentStroke, true);
 }
-function endDrawMouse() {
+
+function endDraw() {
   if (mode === 'eraser') { eraserCursor.style.display = 'none'; return; }
   if (!isDrawing || !currentStroke) return;
   isDrawing = false;
@@ -3165,118 +3012,121 @@ setMode('draw');
 
 
 <script>
-// ═══════════════════════════════════════════════
-//  iPad / 모바일 전용 기능
-// ═══════════════════════════════════════════════
+// ═══════════════════════════════════════
+//  iPad / 모바일 기능
+// ═══════════════════════════════════════
 
-const sidebar  = document.querySelector('.sidebar');
-const overlay  = document.getElementById('sidebar-overlay');
-const mHeader  = document.getElementById('mobile-header');
+const sidebar = document.querySelector('.sidebar');
+const overlay = document.getElementById('sidebar-overlay');
 const isMobile = () => window.innerWidth <= 1024 || ('ontouchstart' in window);
 
-// ── 사이드바 드로어 토글 ──
+// 사이드바 토글
 function toggleSidebar() {
-  const isOpen = sidebar.classList.toggle('open');
-  overlay.classList.toggle('show', isOpen);
-  // 열릴 때 스크롤 잠금
-  document.body.style.overflow = isOpen ? 'hidden' : '';
+  const open = sidebar.classList.toggle('open');
+  overlay.classList.toggle('show', open);
+  document.body.style.overflow = open ? 'hidden' : '';
 }
 
-// 사이드바 링크 클릭 시 자동 닫기 (모바일)
+// 목차 링크 클릭 시 닫기
 document.querySelectorAll('.nav-link').forEach(link => {
   link.addEventListener('click', () => {
-    if (isMobile()) toggleSidebar();
+    if (isMobile()) {
+      toggleSidebar();
+    }
   });
 });
 
-// 스와이프로 사이드바 닫기
-let touchStartX = 0;
+// 스와이프로 사이드바 열기/닫기
+let swipeStartX = 0;
 document.addEventListener('touchstart', e => {
-  touchStartX = e.touches[0].clientX;
+  swipeStartX = e.touches[0].clientX;
 }, { passive: true });
 document.addEventListener('touchend', e => {
-  const dx = e.changedTouches[0].clientX - touchStartX;
-  if (dx < -60 && sidebar.classList.contains('open')) toggleSidebar(); // 왼쪽 스와이프
-  if (dx > 60 && touchStartX < 30 && !sidebar.classList.contains('open')) toggleSidebar(); // 오른쪽 스와이프 (왼쪽 끝에서)
+  const dx = e.changedTouches[0].clientX - swipeStartX;
+  if (dx > 60 && swipeStartX < 30) toggleSidebar();   // 왼쪽 끝에서 오른쪽 스와이프 → 열기
+  if (dx < -60 && sidebar.classList.contains('open')) toggleSidebar(); // 왼쪽 스와이프 → 닫기
 }, { passive: true });
 
-// ── Apple Pencil 필압 감지 ──
-// PointerEvent API: 펜슬은 pointerType='pen', 손가락은 'touch'
-let isStylus = false;
+// ── Apple Pencil: PointerEvent로 필기 / 손가락은 스크롤 ──
+const annotCanvas = document.getElementById('annot-canvas');
 
-canvas.addEventListener('pointerdown', e => {
-  isStylus = (e.pointerType === 'pen');
-  if (isStylus) {
-    // 필압에 따라 굵기 동적 조절
-    const pressure = e.pressure || 0.5;
-    const baseSize = +document.getElementById('pen-size').value;
-    canvas._pressureSize = Math.max(1, baseSize * pressure * 2);
-  }
-  // 손가락이면 스크롤 모드 (필기 안 함)
-  if (!isStylus && mode !== 'erase') {
-    canvas.style.pointerEvents = 'none';
-    setTimeout(() => { canvas.style.pointerEvents = ''; }, 300);
-  }
-}, { passive: true });
-
-canvas.addEventListener('pointermove', e => {
-  if (isStylus && isDrawing && currentStroke) {
-    const pressure = e.pressure || 0.5;
-    const baseSize = +document.getElementById('pen-size').value;
-    currentStroke.size = Math.max(1, baseSize * pressure * 2.5);
-  }
-}, { passive: true });
-
-// ── 툴바 토글 (모바일용 오버라이드) ──
-const _origToggle = toggleToolbar;
-function toggleToolbar() {
-  const toolbar = document.getElementById('annot-toolbar');
-  const hidden  = toolbar.classList.toggle('hidden');
-  document.body.classList.toggle('annot-active', !hidden);
-  // 모바일: FAB 숨김이니까 헤더 버튼 색상만 변경
-  if (isMobile()) {
-    const pencilBtn = mHeader.querySelectorAll('button')[1];
-    if (pencilBtn) pencilBtn.style.color = hidden ? '' : '#60a5fa';
-  } else {
-    const fab = document.getElementById('annot-fab');
-    if (fab) { fab.textContent = hidden ? '✏️' : '✕'; }
-  }
-  if (!hidden) { resizeCanvas(); setMode('draw'); }
+// 펜슬 또는 마우스인지 확인
+function isPenOrMouse(e) {
+  return e.pointerType === 'pen' || e.pointerType === 'mouse';
 }
 
-// ── 뷰포트 크기 변경 시 재계산 (가로/세로 회전 포함) ──
-window.addEventListener('orientationchange', () => {
-  setTimeout(resizeCanvas, 300);
+// PointerEvent 핸들러 등록 (기존 mouse/touch 이벤트 대신)
+annotCanvas.addEventListener('pointerdown', e => {
+  if (!isPenOrMouse(e)) return;  // 손가락이면 무시 → 스크롤됨
+  e.preventDefault();
+  annotCanvas.setPointerCapture(e.pointerId);
+
+  if (mode === 'text') { placeText(e); return; }
+  if (mode === 'eraser') { eraseAt({ x: e.clientX - annotCanvas.getBoundingClientRect().left, y: e.clientY - annotCanvas.getBoundingClientRect().top }); return; }
+
+  isDrawing = true;
+  const r = annotCanvas.getBoundingClientRect();
+  const pos = { x: e.clientX - r.left, y: e.clientY - r.top };
+  const pressure = e.pressure > 0 ? e.pressure : 0.5;
+  const baseSize = +document.getElementById('pen-size').value;
+  const alpha = mode === 'highlight' ? 0.35 : 1.0;
+  const size  = mode === 'highlight' ? baseSize * 5 : Math.max(1, baseSize * (0.4 + pressure * 1.2));
+
+  currentStroke = { type: mode, color: penColor, size, alpha, points: [pos] };
+}, { passive: false });
+
+annotCanvas.addEventListener('pointermove', e => {
+  if (!isPenOrMouse(e) || !isDrawing || !currentStroke) return;
+  e.preventDefault();
+  const r = annotCanvas.getBoundingClientRect();
+  const pos = { x: e.clientX - r.left, y: e.clientY - r.top };
+
+  if (mode === 'eraser') {
+    eraseAt(pos);
+    return;
+  }
+
+  // 필압에 따른 굵기 조절
+  if (mode !== 'highlight' && e.pressure > 0) {
+    const baseSize = +document.getElementById('pen-size').value;
+    currentStroke.size = Math.max(1, baseSize * (0.4 + e.pressure * 1.2));
+  }
+  currentStroke.points.push(pos);
+  redraw();
+  drawStroke(currentStroke, true);
+}, { passive: false });
+
+annotCanvas.addEventListener('pointerup', e => {
+  if (!isPenOrMouse(e)) return;
+  if (mode === 'eraser') { eraserCursor.style.display = 'none'; return; }
+  if (!isDrawing || !currentStroke) return;
+  isDrawing = false;
+  strokes.push(currentStroke);
+  currentStroke = null;
 });
 
-// ── 초기화: 모바일이면 상단 여백 추가 ──
-function initMobileLayout() {
-  if (isMobile()) {
-    document.querySelector('.main').style.paddingTop = '72px';
-  }
-}
-initMobileLayout();
-window.addEventListener('resize', initMobileLayout);
+annotCanvas.addEventListener('pointercancel', () => {
+  isDrawing = false;
+  currentStroke = null;
+});
 
-// ── 인쇄 함수 오버라이드 (모바일 UI 고려) ──
-function printNote() {
-  const canvas  = document.getElementById('annot-canvas');
+// 모바일에서 툴바 토글 시 헤더 아이콘 색상 변경
+const origToggle = window.toggleToolbar;
+window.toggleToolbar = function() {
   const toolbar = document.getElementById('annot-toolbar');
-  const fab     = document.getElementById('annot-fab');
-  const mhdr    = document.getElementById('mobile-header');
-  canvas.style.display  = 'none';
-  toolbar.classList.add('hidden');
-  if (fab)  fab.style.display  = 'none';
-  if (mhdr) mhdr.style.display = 'none';
-  document.body.classList.remove('annot-active');
-  window.print();
-  setTimeout(() => {
-    canvas.style.display  = '';
-    toolbar.classList.remove('hidden');
-    if (fab)  fab.style.display  = '';
-    if (mhdr) mhdr.style.display = '';
-    document.body.classList.add('annot-active');
-  }, 1200);
+  const hidden = toolbar.classList.toggle('hidden');
+  document.body.classList.toggle('annot-active', !hidden);
+  const fab = document.getElementById('annot-fab');
+  if (fab) fab.textContent = hidden ? '✏️' : '✕';
+  if (!hidden) { resizeCanvas(); setMode('draw'); }
+};
+
+// 방향 전환 시 캔버스 재계산
+window.addEventListener('orientationchange', () => setTimeout(resizeCanvas, 400));
+
+// 모바일 레이아웃 초기화
+if (isMobile()) {
+  document.querySelector('.main').style.paddingTop = '68px';
 }
 </script>
 
